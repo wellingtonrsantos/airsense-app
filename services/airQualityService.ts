@@ -6,21 +6,18 @@ const API_BASE_URL = "http://192.168.1.13:3000";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000, // 15 segundos
+  timeout: 15000,
 });
 
-// Coordenadas fixas
-const COORDINATES = {
-  lat: -23.61404409606389,
-  lon: -46.74878386104627,
-};
-
-export const fetchAirQualityData = async (): Promise<AirQualityData> => {
+export const fetchAirQualityData = async (
+  lat: number,
+  lon: number
+): Promise<AirQualityData> => {
   try {
     const response = await api.get<AirQualityData>("/air-quality", {
       params: {
-        lat: COORDINATES.lat,
-        lon: COORDINATES.lon,
+        lat,
+        lon,
       },
     });
 

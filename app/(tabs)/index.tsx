@@ -1,13 +1,16 @@
 import { AQICircle } from "@/components/AQICircle";
-import { ErrorScreen } from "@/components/ErrorScreen";
+import { ErrorScreen, ErrorType } from "@/components/ErrorScreen";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { PollutantCard } from "@/components/PollutantCard";
 import { WeatherInfo } from "@/components/WeatherInfo";
 import { fetchAirQualityData } from "@/services/airQualityService";
 import { AirQualityData, getAQIStatus } from "@/types/airQuality";
 import { getErrorMessage } from "@/utils/apiErrorHandler";
-import { useEffect, useMemo, useState } from "react";
+import { PermissionError } from "@/utils/customErrors";
+import * as Location from "expo-location";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  AppState,
   RefreshControl,
   ScrollView,
   StatusBar,
@@ -36,14 +39,44 @@ export default function AirQualityScreen() {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [errorType, setErrorType] = useState<ErrorType>("generic");
   const [refreshing, setRefreshing] = useState(false);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setError(null);
-      const data = await fetchAirQualityData();
+      setErrorType("generic");
+
+      const { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status !== "granted") {
+        throw new PermissionError(
+          "Permissão de localização negada. Ative nas configurações do celular para usar o app."
+        );
+      }
+
+      const LOCATION_MAX_AGE_MS = 5 * 60 * 1000;
+
+      console.log("Tentando obter a última localização conhecida...");
+      let location = await Location.getLastKnownPositionAsync({});
+
+      if (location && Date.now() - location.timestamp < LOCATION_MAX_AGE_MS) {
+        console.log("Usando localização do cache (recente).");
+      } else {
+        console.log("Última localização não encontrada, buscando uma nova...");
+        location = await Location.getCurrentPositionAsync({});
+      }
+
+      const { latitude, longitude } = location.coords;
+      console.log("Localização obtida:", { latitude, longitude });
+
+      const data = await fetchAirQualityData(latitude, longitude);
       setAirQualityData(data);
     } catch (error: unknown) {
+      if (error instanceof PermissionError) {
+        setErrorType("permission");
+      }
+
       const friendlyMessage = getErrorMessage(error);
       setError(friendlyMessage);
       console.error("Erro capturado na tela:", error);
@@ -51,22 +84,40 @@ export default function AirQualityScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, []);
 
-  const onRefresh = async () => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await loadData();
-  };
+  }, [loadData]);
 
-  const onRetry = async () => {
+  const onRetry = useCallback(async () => {
     setLoading(true);
     setError(null);
     await loadData();
-  };
+  }, [loadData]);
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
+
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState: string) => {
+      if (nextAppState === "active" && errorType === "permission") {
+        console.log("App voltou a ficar ativo, tentando recarregar...");
+        onRetry();
+      }
+    };
+
+    const subscription = AppState.addEventListener(
+      "change",
+      handleAppStateChange
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, [errorType, onRetry]);
 
   const pollutantRows = useMemo(() => {
     if (!airQualityData?.pollutants) return [];
@@ -85,7 +136,9 @@ export default function AirQualityScreen() {
 
   // Tela de erro
   if (error) {
-    return <ErrorScreen message={error} onRetry={onRetry} />;
+    return (
+      <ErrorScreen message={error} onRetry={onRetry} errorType={errorType} />
+    );
   }
 
   // Fallback
