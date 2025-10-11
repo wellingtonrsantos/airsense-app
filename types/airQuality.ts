@@ -10,6 +10,7 @@ export interface AirQualityData {
   dominantPollutant: string;
   lastUpdate: string;
   pollutants: Pollutant[];
+  weather: WeatherData;
 }
 
 export interface AQIStatus {
@@ -18,37 +19,60 @@ export interface AQIStatus {
   recommendation: string;
 }
 
+export interface WeatherData {
+  temperature: number | null;
+  humidity: number | null;
+}
+
+export interface ErrorResponse {
+  error: string;
+  message: string;
+}
+
 export const getAQIStatus = (aqi: number): AQIStatus => {
-  if (aqi <= 50) {
+  const aqiValue = Math.floor(aqi);
+
+  if (aqiValue <= 50) {
     return {
       status: "BOM",
       color: "#4CAF50",
       recommendation:
-        "Qualidade do ar satisfatória para a maioria das pessoas.",
+        "Qualidade do ar satisfatória. Pouco ou nenhum risco de poluição.",
     };
-  } else if (aqi <= 100) {
+  } else if (aqiValue <= 100) {
     return {
       status: "MODERADO",
       color: "#FFC107",
-      recommendation: "Pessoas sensíveis podem sentir sintomas leves.",
+      recommendation:
+        "Qualidade aceitável. Pessoas sensíveis devem limitar esforços prolongados ao ar livre.",
     };
-  } else if (aqi <= 150) {
+  } else if (aqiValue <= 150) {
     return {
       status: "RUIM",
       color: "#FF6B35",
-      recommendation: "Pessoas sensíveis devem limitar atividades ao ar livre.",
+      recommendation:
+        "Membros de grupos sensíveis podem ter problemas de saúde. Limite esforços prolongados ao ar livre.",
     };
-  } else if (aqi <= 200) {
+  } else if (aqiValue <= 200) {
     return {
       status: "MUITO RUIM",
       color: "#F44336",
-      recommendation: "Todos devem evitar atividades ao ar livre.",
+      recommendation:
+        "Todos podem começar a sentir efeitos. Grupos sensíveis devem EVITAR esforços prolongados ao ar livre.",
     };
-  } else {
+  } else if (aqiValue <= 300) {
     return {
       status: "PERIGOSO",
       color: "#9C27B0",
-      recommendation: "Emergência de saúde. Toda população pode ser afetada.",
+      recommendation:
+        "Alerta de emergência. Grupos sensíveis devem EVITAR toda atividade ao ar livre.",
+    };
+  } else {
+    return {
+      status: "EMERGÊNCIA",
+      color: "#4A148C",
+      recommendation:
+        "Alerta de saúde. TODOS devem evitar toda atividade e exposição ao ar livre.",
     };
   }
 };

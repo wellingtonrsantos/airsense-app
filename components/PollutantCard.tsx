@@ -1,21 +1,25 @@
-import { Pollutant, getPollutantName } from "@/types/airQuality";
+import { AQIStatus, Pollutant, getPollutantName } from "@/types/airQuality";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 interface PollutantCardProps {
   pollutant: Pollutant;
   isHighlighted?: boolean;
+  aqiStatus?: AQIStatus;
 }
 
 export const PollutantCard: React.FC<PollutantCardProps> = ({
   pollutant,
   isHighlighted = false,
+  aqiStatus,
 }) => {
+  const highlightColor = aqiStatus?.color || "#FF6B35";
+
   return (
     <View
       style={[
         styles.pollutantCard,
-        isHighlighted && styles.pollutantCardHighlighted,
+        isHighlighted && { backgroundColor: highlightColor },
       ]}
     >
       <Text
@@ -55,9 +59,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     minWidth: 100,
-  },
-  pollutantCardHighlighted: {
-    backgroundColor: "#FF6B35",
   },
   pollutantValue: {
     fontSize: 18,

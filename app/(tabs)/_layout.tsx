@@ -1,8 +1,12 @@
 import { Tabs } from "expo-router";
-import { Home } from "lucide-react-native";
+import { Home, Info } from "lucide-react-native";
 
 function HomeIcon({ size, color }: { size: number; color: string }) {
   return <Home size={size} color={color} />;
+}
+
+function InfoIcon({ size, color }: { size: number; color: string }) {
+  return <Info size={size} color={color} />;
 }
 
 export default function TabLayout() {
@@ -10,8 +14,15 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        tabBarActiveTintColor: "#FF6B35",
+        tabBarInactiveTintColor: "#666",
         tabBarStyle: {
-          display: "none", // Hide tab bar for single screen focus
+          backgroundColor: "#FFFFFF",
+          borderTopWidth: 1,
+          borderTopColor: "#E0E0E0",
+          paddingBottom: 8,
+          paddingTop: 8,
+          height: 70,
         },
       }}
     >
@@ -20,6 +31,13 @@ export default function TabLayout() {
         options={{
           title: "Qualidade do Ar",
           tabBarIcon: HomeIcon,
+        }}
+      />
+      <Tabs.Screen
+        name="about"
+        options={{
+          title: "Sobre",
+          tabBarIcon: InfoIcon,
         }}
       />
     </Tabs>

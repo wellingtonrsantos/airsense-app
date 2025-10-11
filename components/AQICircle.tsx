@@ -9,9 +9,7 @@ interface AQICircleProps {
 }
 
 export const AQICircle: React.FC<AQICircleProps> = ({ aqi, status }) => {
-  // Gera cores do gradiente baseado na cor principal do status
   const getGradientColors = (color: string) => {
-    // Para simplificar, vamos usar variações da cor principal
     switch (color) {
       case "#4CAF50": // BOM
         return ["#66BB6A", "#4CAF50", "#388E3C"] as const;
@@ -23,6 +21,8 @@ export const AQICircle: React.FC<AQICircleProps> = ({ aqi, status }) => {
         return ["#EF5350", "#F44336", "#D32F2F"] as const;
       case "#9C27B0": // PERIGOSO
         return ["#AB47BC", "#9C27B0", "#7B1FA2"] as const;
+      case "#4A148C": // EMERGÊNCIA
+        return ["#673AB7", "#4A148C", "#311B92"] as const;
       default:
         return ["#FF7A45", "#FF6B35", "#FF5722"] as const;
     }

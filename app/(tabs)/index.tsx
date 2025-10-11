@@ -1,9 +1,12 @@
 import { AQICircle } from "@/components/AQICircle";
+import { ErrorScreen } from "@/components/ErrorScreen";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { PollutantCard } from "@/components/PollutantCard";
+import { WeatherInfo } from "@/components/WeatherInfo";
 import { fetchAirQualityData } from "@/services/airQualityService";
 import { AirQualityData, getAQIStatus } from "@/types/airQuality";
-import { useEffect, useState } from "react";
+import { getErrorMessage } from "@/utils/apiErrorHandler";
+import { useEffect, useMemo, useState } from "react";
 import {
   RefreshControl,
   ScrollView,
@@ -14,19 +17,36 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+// Formatar data de atualização
+const formatLastUpdate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleString("pt-BR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZoneName: "short",
+  });
+};
+
 export default function AirQualityScreen() {
   const [airQualityData, setAirQualityData] = useState<AirQualityData | null>(
     null
   );
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   const loadData = async () => {
     try {
+      setError(null);
       const data = await fetchAirQualityData();
       setAirQualityData(data);
-    } catch (error) {
-      console.error("Erro ao carregar dados:", error);
+    } catch (error: unknown) {
+      const friendlyMessage = getErrorMessage(error);
+      setError(friendlyMessage);
+      console.error("Erro capturado na tela:", error);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -38,47 +58,42 @@ export default function AirQualityScreen() {
     await loadData();
   };
 
+  const onRetry = async () => {
+    setLoading(true);
+    setError(null);
+    await loadData();
+  };
+
   useEffect(() => {
     loadData();
   }, []);
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
+  const pollutantRows = useMemo(() => {
+    if (!airQualityData?.pollutants) return [];
 
-  if (!airQualityData) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.errorText}>Erro ao carregar dados</Text>
-      </SafeAreaView>
-    );
-  }
-
-  const aqiStatus = getAQIStatus(airQualityData.aqi);
-
-  // Formatar data de atualização
-  const formatLastUpdate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString("pt-BR", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      timeZoneName: "short",
-    });
-  };
-
-  // Organizar poluentes em linhas de 3
-  const organizePolluantsInRows = () => {
     const rows = [];
     for (let i = 0; i < airQualityData.pollutants.length; i += 3) {
       rows.push(airQualityData.pollutants.slice(i, i + 3));
     }
     return rows;
-  };
+  }, [airQualityData]);
 
-  const pollutantRows = organizePolluantsInRows();
+  // Loading inicial
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  // Tela de erro
+  if (error) {
+    return <ErrorScreen message={error} onRetry={onRetry} />;
+  }
+
+  // Fallback
+  if (!airQualityData) {
+    return <ErrorScreen message="Dados não disponíveis" onRetry={onRetry} />;
+  }
+
+  const aqiStatus = getAQIStatus(airQualityData.aqi);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -93,7 +108,8 @@ export default function AirQualityScreen() {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>
-            Qualidade do Ar em:{"\n"}Pinheiros, São Paulo
+            Qualidade do Ar em:{"\n"}
+            {airQualityData.location}
           </Text>
         </View>
 
@@ -104,13 +120,16 @@ export default function AirQualityScreen() {
 
         {/* Status and Recommendation */}
         <View style={styles.statusSection}>
-          <Text style={[styles.statusText, { color: aqiStatus.color }]}>
-            {aqiStatus.status}
-          </Text>
           <Text style={styles.recommendationText}>
             {aqiStatus.recommendation}
           </Text>
         </View>
+
+        {/* Weather Information */}
+        <WeatherInfo
+          temperature={airQualityData.weather.temperature}
+          humidity={airQualityData.weather.humidity}
+        />
 
         {/* Pollutants Section */}
         <View style={styles.pollutantsSection}>
@@ -126,6 +145,7 @@ export default function AirQualityScreen() {
                     isHighlighted={
                       pollutant.id === airQualityData.dominantPollutant
                     }
+                    aqiStatus={aqiStatus}
                   />
                 ))}
               </View>

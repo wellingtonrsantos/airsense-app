@@ -1,49 +1,43 @@
 import { AirQualityData } from "@/types/airQuality";
+import { ApiError } from "@/utils/apiErrorHandler";
+import axios, { isAxiosError } from "axios";
 
-// Simula uma chamada de API
+const API_BASE_URL = "http://192.168.1.13:3000";
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 15000, // 15 segundos
+});
+
+// Coordenadas fixas
+const COORDINATES = {
+  lat: -23.61404409606389,
+  lon: -46.74878386104627,
+};
+
 export const fetchAirQualityData = async (): Promise<AirQualityData> => {
-  // Simula delay de rede
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  try {
+    const response = await api.get<AirQualityData>("/air-quality", {
+      params: {
+        lat: COORDINATES.lat,
+        lon: COORDINATES.lon,
+      },
+    });
 
-  // Dados simulados - em produção viria de uma API real
-  const mockData: AirQualityData = {
-    aqi: 102,
-    location: "Pinheiros, São Paulo, Brazil",
-    dominantPollutant: "pm25",
-    lastUpdate: "2025-09-28T18:30:00-03:00",
-    pollutants: [
-      {
-        id: "pm25",
-        value: 36,
-        unit: "µg/m³",
-      },
-      {
-        id: "pm10",
-        value: 55,
-        unit: "µg/m³",
-      },
-      {
-        id: "03",
-        value: 90,
-        unit: "µg/m³",
-      },
-      {
-        id: "no2",
-        value: 45,
-        unit: "µg/m³",
-      },
-      {
-        id: "co",
-        value: 2.8,
-        unit: "ppm",
-      },
-      {
-        id: "so2",
-        value: 45,
-        unit: "µg/m³",
-      },
-    ],
-  };
+    return response.data;
+  } catch (error) {
+    if (isAxiosError(error)) {
+      if (error.response) {
+        const status = error.response.status;
+        const errorType = error.response.statusText;
 
-  return mockData;
+        const message =
+          error.response.data?.message || "Ocorreu um erro no servidor.";
+
+        throw new ApiError(status, errorType, message);
+      }
+    }
+
+    throw error;
+  }
 };
