@@ -96,7 +96,7 @@ export default function AirQualityScreen() {
   const aqiStatus = getAQIStatus(airQualityData.aqi);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <StatusBar barStyle="dark-content" backgroundColor="#F5F5F5" />
 
       <ScrollView
