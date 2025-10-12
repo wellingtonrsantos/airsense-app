@@ -6,23 +6,23 @@
 ![Expo](https://img.shields.io/badge/expo-1B1F23?style=for-the-badge&logo=expo&logoColor=white)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 
-## Descrição
+## 📝 Descrição
 
 Um aplicativo mobile para exibir dados de qualidade do ar em tempo real, baseado na localização do usuário.
 
 **Contexto do Projeto:** Este aplicativo faz parte do projeto de **Atividades Práticas Supervisionadas (APS)** da disciplina de **Desenvolvimento de Sistemas Distribuídos (DSD)** no curso de Ciência da Computação (UNIP). Ele serve como o _Cliente_ do nosso sistema, consumindo dados da [AirSense API](https://github.com/wellingtonrsantos/airsense-api).
 
-## O que faz?
+## 🚀 O que faz?
 
 Este aplicativo atua como o Cliente do nosso Sistema Distribuído. Ele obtém a localização do usuário, envia as coordenadas para a AirSense API (o Gateway Intermediário) e exibe os dados de qualidade do ar recebidos de forma clara e amigável, fornecendo alertas visuais e recomendações de saúde baseadas no padrão US-EPA.
 
-## Telas do Aplicativo
+## 📱 Telas do Aplicativo
 
 |                            Tela Principal                            |                            Tela Sobre                             |
 | :------------------------------------------------------------------: | :---------------------------------------------------------------: |
 | <img src="./docs/images/home.png" alt="Tela Principal" width="300"/> | <img src="./docs/images/about.png" alt="Tela Sobre" width="300"/> |
 
-## Pré-requisito: Iniciando a AirSense API (Gateway DSD)
+## 🔗 Pré-requisito: Iniciando a AirSense API (Gateway DSD)
 
 Para que este aplicativo funcione, a `airsense-api` **deve estar em execução**, pois ela é a fonte de dados.
 
@@ -55,7 +55,7 @@ Para que este aplicativo funcione, a `airsense-api` **deve estar em execução**
     ```
     A API estará acessível em `http://localhost:3000`.
 
-## Como rodar o App localmente
+## 💻 Como rodar o App localmente
 
 **Pré-requisitos:**
 
@@ -81,7 +81,7 @@ Para que este aplicativo funcione, a `airsense-api` **deve estar em execução**
 4.  **Abra no seu celular:**
     - Escaneie o QR code exibido no terminal com o app Expo Go.
 
-## Como rodar o App com Docker
+## 🐳 Como rodar o App com Docker
 
 A imagem já está disponível no [Docker Hub](https://hub.docker.com/r/wellingtonrsantos/airsense-app).
 
