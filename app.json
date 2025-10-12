@@ -50,7 +50,8 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Permitir que o app use sua localização para obter dados da qualidade do ar."
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
