@@ -1,8 +1,11 @@
 import { AirQualityData } from "@/types/airQuality";
 import { ApiError } from "@/utils/apiErrorHandler";
 import axios, { isAxiosError } from "axios";
+import Constants from "expo-constants";
+import { Platform } from "react-native";
 
-const API_BASE_URL = "http://192.168.1.13:3000";
+const HOST_API_URL = Constants.expoConfig?.extra?.HOST_API_URL;
+const API_BASE_URL = Platform.OS === "web" ? "" : HOST_API_URL;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -11,7 +14,7 @@ const api = axios.create({
 
 export const fetchAirQualityData = async (
   lat: number,
-  lon: number
+  lon: number,
 ): Promise<AirQualityData> => {
   try {
     const response = await api.get<AirQualityData>("/air-quality", {

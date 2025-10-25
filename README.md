@@ -55,6 +55,25 @@ Para que este aplicativo funcione, a `airsense-api` **deve estar em execução**
     ```
     A API estará acessível em `http://localhost:3000`.
 
+---
+
+## ⚙️ Configuração de Ambiente (Obrigatório)
+
+Este aplicativo acessa a API através do IP da sua máquina. Para que o aplicativo mobile consiga se conectar (via Expo Go), você deve configurar o IP da sua máquina na rede local.
+
+1.  **Crie o arquivo `.env`:** Na raiz deste projeto, crie um arquivo chamado **`.env`** (ele está listado no `.gitignore` por motivos de segurança).
+2.  **Defina o IP:** Adicione a seguinte variável, substituindo o valor pelo **IP da sua máquina host (onde a API está rodando)**:
+    ```bash
+    # .env
+    #
+    # **IMPORTANTE:** Este IP deve ser o endereço da sua máquina na rede (ex: 192.168.1.13).
+    # O Mobile (Expo Go) usará este IP para acessar a API na porta 3000.
+    HOST_IP_ADDRESS=<SEU_IP_AQUI>
+    ```
+
+    *Para descobrir o seu IP na rede, use `ip a` (Linux/WSL) ou `ipconfig` (Windows) no terminal.*
+---
+
 ## 💻 Como rodar o App localmente
 
 **Pré-requisitos:**
@@ -74,11 +93,12 @@ Para que este aplicativo funcione, a `airsense-api` **deve estar em execução**
     ```bash
     npm install
     ```
-3.  **Inicie o aplicativo:**
+3.  **Configure o `.env`** (veja seção acima).
+4.  **Inicie o aplicativo:**
     ```bash
     npx expo start --tunnel
     ```
-4.  **Abra no seu celular:**
+5.  **Abra no seu celular:**
     - Escaneie o QR code exibido no terminal com o app Expo Go.
 
 ## 🐳 Como rodar o App com Docker
@@ -96,7 +116,7 @@ A imagem já está disponível no [Docker Hub](https://hub.docker.com/r/wellingt
     O comando abaixo irá baixar a imagem, iniciar o container e mapear a porta do Metro Bundler (8081) em modo _detached_ (segundo plano). O `sleep infinity` é usado para manter o container vivo.
 
     ```bash
-    docker run -d -p 8081:8081 --name airsense-app wellingtonrsantos/airsense-app:1.0.0 sleep infinity
+    docker run -d -p 8081:8081 --name airsense-app -e HOST_IP_ADDRESS="<SEU_IP_AQUI>" wellingtonrsantos/airsense-app:1.0.0 sleep infinity
     ```
 
 2.  **Inicie o Metro Bundler (Interativo):**
