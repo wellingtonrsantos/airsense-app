@@ -4,9 +4,11 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 import { PollutantCard } from "@/components/PollutantCard";
 import { WeatherInfo } from "@/components/WeatherInfo";
 import { fetchAirQualityData } from "@/services/airQualityService";
-import { AirQualityData, getAQIStatus } from "@/types/airQuality";
+import { AirQualityData } from "@/types/airQuality";
 import { getErrorMessage } from "@/utils/apiErrorHandler";
 import { PermissionError } from "@/utils/customErrors";
+import { formatLastUpdate } from "@/utils/formatters";
+import { getAQIStatus } from "@/utils/statusMapper";
 import * as Location from "expo-location";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -19,19 +21,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-// Formatar data de atualização
-const formatLastUpdate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleString("pt-BR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZoneName: "short",
-  });
-};
 
 export default function AirQualityScreen() {
   const [airQualityData, setAirQualityData] = useState<AirQualityData | null>(

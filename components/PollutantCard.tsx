@@ -1,4 +1,5 @@
-import { AQIStatus, Pollutant, getPollutantName } from "@/types/airQuality";
+import { AQIStatus, Pollutant } from "@/types/airQuality";
+import { getPollutantName } from "@/utils/statusMapper";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
