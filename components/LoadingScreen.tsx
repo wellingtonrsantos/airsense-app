@@ -3,7 +3,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 export const LoadingScreen: React.FC = () => {
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="loading-screen">
       <ActivityIndicator size="large" color="#FF6B35" />
       <Text style={styles.loadingText}>
         Carregando dados de qualidade do ar da sua região...

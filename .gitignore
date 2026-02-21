@@ -46,3 +46,6 @@ app-example
 .vscode
 
 GEMINI.md
+
+coverage/
+.nyc_output/
