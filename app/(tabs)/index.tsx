@@ -149,7 +149,7 @@ export default function AirQualityScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>
+          <Text style={styles.headerTitle} testID="location-text">
             Qualidade do Ar em:{"\n"}
             {airQualityData.location}
           </Text>
